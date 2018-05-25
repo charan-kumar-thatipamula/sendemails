@@ -4,7 +4,17 @@ public class Email {
     private String from;
     private String to;
     private String subject;
+
+    public String getPwd() {
+        return pwd;
+    }
+
+    public void setPwd(String pwd) {
+        this.pwd = pwd;
+    }
+
     private String body;
+    private String pwd;
 
     public String getFrom() {
         return from;

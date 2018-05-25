@@ -6,12 +6,16 @@ import javax.mail.internet.*;
 
 public class EmailSendService {
     public void sendEmail(Email em) {
-        sendFromGMail(em.getFrom(), "**********", new String[]{"omprasadraolokoti@gmail.com"}, em.getSubject(), em.getBody());
+        sendFromGMail(em.getFrom(), em.getPwd(), new String[]{"charant.me.csa@gmail.com"}, em.getSubject(), em.getBody());
     }
 
+    // editor@clinicalstudiesjournal.com
+    // row123!@#
     private static void sendFromGMail(String from, String pass, String[] to, String subject, String body) {
+        System.out.println("Sending email : " + subject);
         Properties props = System.getProperties();
-        String host = "smtp.gmail.com";
+//        String host = "smtp.gmail.com";
+        String host = "smtp.clinicalstudiesjournal.com";
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", host);
         props.put("mail.smtp.user", from);
@@ -38,10 +42,25 @@ public class EmailSendService {
             message.setSubject(subject);
 //            message.setText(body);
             message.setContent(body, "text/html; charset=utf-8");
+
             Transport transport = session.getTransport("smtp");
             transport.connect(host, from, pass);
             transport.sendMessage(message, message.getAllRecipients());
             transport.close();
+
+            // Copy message to "Sent Items" folder as read
+            Store store = session.getStore("imap");
+            store.connect("imap.clinicalstudiesjournal.com", from, pass);
+
+            Folder[] f = store.getDefaultFolder().list();
+            for(Folder fd:f)
+                System.out.println(">> "+fd.getName());
+
+            Folder folder = store.getFolder("Sent Items");
+            folder.open(Folder.READ_WRITE);
+            message.setFlag(Flags.Flag.SEEN, false);
+            folder.appendMessages(new Message[] {message});
+            store.close();
         }
         catch (AddressException ae) {
             ae.printStackTrace();
